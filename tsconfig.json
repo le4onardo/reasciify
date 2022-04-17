@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "outDir": "dist", // where to put the compiled JS files
+    "target": "ES2020", // which level of JS support to target
+    "module": "ES2020", // which system for the program AMD, UMD, System, CommonJS
+    "allowSyntheticDefaultImports": true,
+    // Recommended: Compiler complains about expressions implicitly typed as 'any'
+    //"noImplicitAny": true,
+    "typeRoots": ["node_modules/@types", "index.d.ts"],
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["src/*", "node_modules/*"]
+    }
+  },
+  "include": ["src", "index.d.ts"], // which files to compile
+  "exclude": ["node_modules"] // which files to skip
+}
