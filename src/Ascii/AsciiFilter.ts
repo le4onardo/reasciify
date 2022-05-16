@@ -1,6 +1,5 @@
-// import { vertex } from '@tools/fragments';
 import { Filter } from '@pixi/core';
-import { Texture, MIPMAP_MODES } from 'pixi.js';
+import { Texture } from 'pixi.js';
 import fontMap from 'Ascii/fontMap.png';
 
 // TODO (cengler) - The Y is flipped in this shader for some reason.
@@ -81,34 +80,19 @@ float averageBlockColor(vec4 coord) {
 
 void main() {
   vec4 coord = gl_FragCoord;
-
-  gl_FragColor =  texture2D(uSampler, sampleCoord(coord.xy)) * averageBlockColor(coord);
+  float averageColor = averageBlockColor(coord);
+  if(averageColor > 0.0) gl_FragColor = averageColor * texture2D(uSampler, sampleCoord(coord.xy));
+  else gl_FragColor = vec4(0);
 }`;
 
-class AsciiFilter extends Filter {
-  /**
-   * @param {number} [size=8] - Size of the font
-   */
-  constructor(size) {
+export default class AsciiFilter extends Filter {
+  constructor() {
     super(vertex, fragment);
-    this.size = size || 8;
-    this.fontTexture = Texture.from(fontMap, { mipmap: MIPMAP_MODES.OFF });
-    //-'"^\]on3b&HAB@0
-    // Ascii value
+    this.fontTexture = Texture.from(fontMap);
+    // ascii values: -'"^\]on3b&HAB@0
     this.charIndexes = [
       45, 96, 34, 94, 92, 93, 111, 110, 51, 98, 38, 72, 65, 66, 64, 48
     ];
-  }
-
-  /**
-   * The pixel size used by the filter.
-   */
-  get size(): number {
-    return this.uniforms.pixelSize;
-  }
-
-  set size(value: number) {
-    this.uniforms.pixelSize = value;
   }
 
   get fontTexture() {
@@ -123,5 +107,3 @@ class AsciiFilter extends Filter {
     this.uniforms.charIndexes = value;
   }
 }
-
-export { AsciiFilter };
