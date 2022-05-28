@@ -1,7 +1,6 @@
 import { Application, Sprite, Container, Loader, Texture } from 'pixi.js';
-import { AsciiFilter } from 'Ascii/AsciiFilter';
+import AsciiFilter from 'Ascii/AsciiFilter';
 import GlitchEmisorFilter from 'Glitch/GlitchEmisorFilter';
-import { GlitchFilter } from '@pixi/filter-glitch';
 
 import assets from 'assets';
 
@@ -18,7 +17,7 @@ const app = new Application({
   height: 1000
 });
 
-const glitch = new GlitchEmisorFilter({ minSize: 2 });
+const glitch = new GlitchEmisorFilter();
 let sprite: Sprite;
 let texture: Texture;
 function main(loader: Loader, resources: any) {
@@ -27,7 +26,7 @@ function main(loader: Loader, resources: any) {
   conty.y = 0;
   app.stage.addChild(conty);
 
-  const media = resources.gray.data as any;
+  const media = resources.thomas.data as any;
 
   if (media.nodeName === 'VIDEO') {
     media.muted = true;
@@ -47,7 +46,7 @@ function main(loader: Loader, resources: any) {
   console.log(sprite.width, sprite.height);
   console.log(window.innerWidth, window.innerHeight);
 
-  const ascii = new AsciiFilter(60);
+  const ascii = new AsciiFilter();
 
   sprite.filters = [ascii, glitch];
   conty.addChild(sprite);
@@ -55,25 +54,25 @@ function main(loader: Loader, resources: any) {
 
 app.loader.add(assets).load(main);
 
-app.ticker.add(() => {
-  glitch.applyRandomOptions();
-});
-
 let prevX = 0;
 let prevY = 0;
+
+function onMouseEnter() {
+  glitch.startGlitch(5000, 0.01);
+}
+
 function onMouseMove(event) {
-  glitch.setOptionsLevels(
-    (Math.abs(event.pageX - prevX) + Math.abs(event.pageY - prevY)) / 500
-  );
   prevX = event.pageX;
   prevY = event.pageY;
 }
+
 function onMouseLeave() {
-  glitch.setOptionsLevels(0.0);
+  glitch.stopGlitch();
 }
 
 document.addEventListener('mousemove', onMouseMove, false);
 document.addEventListener('mouseleave', onMouseLeave, false);
+document.addEventListener('mouseenter', onMouseEnter, false);
 
 window.onresize = () => {
   sprite.scale.x = canvas.clientWidth / texture.width;
