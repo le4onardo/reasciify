@@ -1,4 +1,5 @@
 import { GlitchFilter, GlitchFilterOptions } from '@pixi/filter-glitch';
+import Repeater from './Repeater';
 // import GlitchTransitionerFilter from './GlitchTransitionerFilter';
 
 interface OptionLevels {
@@ -11,8 +12,8 @@ interface OptionLevels {
 
 export default class GlitchEmisorFilter extends GlitchFilter {
   private maxOptionsRanges: Partial<GlitchFilterOptions>;
-
   private optionLevels: OptionLevels;
+  private repeater: Repeater;
 
   constructor(
     options?: Partial<GlitchFilterOptions>,
@@ -26,10 +27,44 @@ export default class GlitchEmisorFilter extends GlitchFilter {
   ) {
     super(options);
     this.maxOptionsRanges = maxOptionsRanges;
-    this.setOptionsLevels(0);
+    this.setIntensityLevels(0);
+    this.repeater = new Repeater();
   }
 
-  public applyRandomOptions() {
+  public getSlicesRange() {
+    return (
+      (this.maxOptionsRanges.slices || this.uniforms[1] / 2) * Math.random()
+    );
+  }
+
+  public getOffsetRange() {
+    return (
+      (this.maxOptionsRanges.offset || this.uniforms[0] / 2) * Math.random()
+    );
+  }
+
+  public getRedRange() {
+    return [
+      (this.maxOptionsRanges.red[0] || this.uniforms[0] / 2) * Math.random(),
+      (this.maxOptionsRanges.red[1] || this.uniforms[1] / 2) * Math.random()
+    ];
+  }
+
+  public getGreenRange() {
+    return [
+      (this.maxOptionsRanges.green[0] || this.uniforms[0] / 2) * Math.random(),
+      (this.maxOptionsRanges.green[1] || this.uniforms[1] / 2) * Math.random()
+    ];
+  }
+
+  public getBlueRange() {
+    return [
+      (this.maxOptionsRanges.blue[0] || this.uniforms[0] / 2) * Math.random(),
+      (this.maxOptionsRanges.blue[1] || this.uniforms[1] / 2) * Math.random()
+    ];
+  }
+
+  public applyRandomGlitch = () => {
     const { offsetLevel, redLevels, greenLevels, blueLevels, slicesLevel } =
       this.optionLevels;
     const random = Math.random();
@@ -57,9 +92,9 @@ export default class GlitchEmisorFilter extends GlitchFilter {
     this.slices = Math.round(
       slicesLevel * random * this.maxOptionsRanges.slices
     );
-  }
+  };
 
-  public setOptionsLevels(levels: number | OptionLevels) {
+  public setIntensityLevels(levels: number | OptionLevels = 0) {
     if (typeof levels === 'number') {
       this.optionLevels = {
         offsetLevel: levels,
@@ -71,5 +106,14 @@ export default class GlitchEmisorFilter extends GlitchFilter {
     } else {
       this.optionLevels = { ...this.optionLevels, ...levels };
     }
+  }
+
+  public startGlitch(duration = 0) {
+    this.repeater.start(this.applyRandomGlitch, duration);
+  }
+
+  public stopGlitch() {
+    this.repeater.stop();
+    this.setIntensityLevels(0);
   }
 }
