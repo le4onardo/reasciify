@@ -48,7 +48,7 @@ function main(loader: Loader, resources: any) {
 
   const ascii = new AsciiFilter();
 
-  sprite.filters = [ascii, glitch];
+  sprite.filters = [glitch];
   conty.addChild(sprite);
 }
 
@@ -58,7 +58,7 @@ let prevX = 0;
 let prevY = 0;
 
 function onMouseEnter() {
-  glitch.startGlitch(5000, 0.01);
+  glitch.startGlitch(5000, 0.5);
 }
 
 function onMouseMove(event) {
